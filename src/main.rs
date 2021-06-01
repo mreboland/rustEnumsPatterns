@@ -116,7 +116,52 @@ fn main() {
 
 
     
-    
+    // Tuple and Struct Patterns
+
+    // Tuple patterns match tuples. They're useful any time we want to get multiple pieces of data involved in a single match:
+    fn describe_point(x: i32, y: i32) -> &'static str {
+        use std::cmp::Ordering::*;
+
+        match (x.cmp(&0), y.cmp(&0)) {
+            (Equal, Equal) => "at the origin",
+            (_, Equal) => "on the x axis",
+            (Equal, _) => "on the y axis",
+            (Greater, Greater) => "in the first quadrant",
+            (Less, Greater) => "in the second quadrant",
+            _ => "somewhere else"
+        }
+    }
+
+    // Struct patterns use curly braces, just like struct expressions. They contain a subpattern for each field:
+    match balloon.location {
+        Point { x: 0, y: height } =>
+            println!("straight up {} meters", height),
+        Point { x: x, y: y} =>
+            println!("at ({}m, {}m", x, y)
+    }
+
+    // In the above example, if the first arm matches, then balloon.location.y is stored in the new local variable height.
+
+    // Suppose balloon.location is Point { x: 30, y: 40 }. Rust checks each component of each pattern in turn (see page 357 for diagram).
+
+    // The second arm matches, so the output would be "at (30m, 40m)".
+
+    // Patterns like Point { x: x, y: y } are common when matching struct, and the redundant names are visual clutter, so Rust has a shorthand for this: Point(x, y). The meaning is the same. This pattern still stores a point's x field in a new local x and its y field in a new local y.
+
+    // Even with the shorthand, it's cumbersome to match a large struct when we only care about a few fields:
+    match get_account(id) {
+        ...
+        Some(Account {
+            name, language, // <--- the 2 things we care about
+            id: _, status: _, address: _, birthday: _, eye_colour: _,
+            pet: _, security_question: _, hashed_innermost_secret: _,
+            is_adamantium_preferred_customer: _}) =>
+          language.show_custom_greeting(name)
+    }
+
+    // To avoid the above, use .. to tell Rust we don't care about any of the other fields:
+    Some(Account { name, language, .. }) =>
+        language.show_custom_greeting(name)
 
 
 
