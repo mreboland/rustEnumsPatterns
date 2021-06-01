@@ -165,4 +165,69 @@ fn main() {
 
 
 
+    // Reference Patters
+
+    // Rust patterns support two features for working with references. ref patterns borrow parts of a matched value. & patterns match references.
+
+    // Matching on a noncopyable value moves the value. Continuing with the account example, this code would be invalid:
+    match account {
+        Account { name, language, .. } => {
+            ui.greet(&name, &language);
+            ui.show_settings(&account); // error, use of moved value `account`
+        }
+    }
+
+    // Here, the fields account.name and account.language are moved into local variables name and language. The rest of account is dropped. That's why we can't call methods on account afterward.
+
+    // If name and language were both copyable values, Rust would copy the fields instead of moving them, and this code would be fine. But suppose these are String. What can we do?
+
+    // We need a kind of pattern that borrows matched values instead of moving them. The ref keyword does just that:
+    match account {
+        Account { ref name, ref language, .. } => {
+            ui.greet(name, language);
+            ui.show_settings(&account); // ok
+        }
+    }
+
+    // Now the local variables name and language are references to the corresponding fields in account. Since account is inly being borrowed, not consumed, it's OK to continue calling methods in it.
+
+    // We can use ref mut to borrow mut references:
+    match line_result {
+        Err(ref err) => log_error(err), // `err` is &Error (shared ref)
+        Ok(ref mut line) => { // `line` is &mut String (mut ref)
+            trim_comments(line); // modify the String in place
+            handle(line);
+        }
+    }
+
+    // The pattern Ok(ref mut line) matches any success result and borrows a mut ref to the success value stored inside it.
+
+    // The opposite kind of ref pattern is the & pattern. A pattern starting with & matches a ref.
+    match sphere.center() {
+        &Point3d { x, y, z } => ...
+    }
+
+    // In this example, suppose sphere.center returns a ref to a private field of sphere, a common pattern in Rust. The value return is the address of a Point3d. If the center is a the origin, then sphere.center() returns &Point3d { x: 0.0, y: 0.0, z: 0.0 }. See page 360 for diagram.
+
+    // This is a bit tricky because Rust is following a pointer here, an action we usually associate with the * operator, not the & operator. The thing to remember is that patterns and expressions are natural opposites. The expression (x, y) makes two values into a new tuple, but the pattern (x, y) does the opposite. It matches a tuple and breaks out the two values. It's the same with &. In an expression, & creates a reference. In a pattern, & matches a reference.
+
+    // Matching a ref follows all the rules we've come to expect. Lifetimes are enforced. We can't get mut access via a shared ref. We can't move a value out of a ref, even a mut ref. When we match &Point3d{ x, y, z }, the variables x, y, and z receive copies of the coordinates, leaving the original Point3d value intact. It works because those fields are copyable. If we try the same thing on a struct with noncopyable fields, we'll get an error:
+    match friend.borrow_car() {
+        Some(&Car { engine, .. }) => // error, can't move out of borrow
+        ...
+        None => {}
+    }
+
+    // Scrapping a borrowed car for parts is not nice, and Rust won't stand for it. We can use a ref pattern to borrow a ref to a part. We just don't own it.
+    Some(&Car { ref engine, .. }) => // ok, engine is a ref
+
+    // Let's look at one more example of an & pattern. Suppose we have an iterator chars over the characters in a string, and it has a method chars.peek() that returns an Option<&char>. A reference to the next character, if any (Peekable iterators do in fact return an Option<&Item Type>, more in chapt 15).
+
+    // A program can use an & pattern to get the pointed_to character:
+    match chars.peek() {
+        Some(&c) => println!("comming up: {:?}", c),
+        None => println!("end of chars")
+    }
+
+
 }
