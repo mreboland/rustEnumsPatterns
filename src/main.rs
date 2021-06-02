@@ -298,6 +298,58 @@ fn main() {
         ...
     }
 
+
+
+    // Where Patterns Are Allowed
+
+    // Although patterns are most prominent in match expressions, they are also allowed in several other places. Typically, in place of an identifier. The meaning is always the same. Instead of just storing a value in a single variable, Rust uses pattern matching to take the value apart.
+
+    // This means patterns can be used to...
+
+    // ...unpack a struct into three new local variables
+    let Track { album, track_number, title, .. } = song;
+
+    // ...unpack a function argument that's a tuple
+    fn distance_to((x, y): (f64, f64)) -> f64 { ... }
+
+    // ...iterate over keys and values of a HashMap
+    for (id, document) in &cache_map {
+        println!("Document #{}: {}", id, document.title);
+    }
+
+    // ...automatically dereference an argument to a closure
+    // (handy because sometimes other code passes use a ref
+    // when we'd rather have a copy)
+    let sum = numbers.fold(0, |a, &num| a + num);
+
+    // The above saves a few lines of code. The same concept exists in JS, called destructuring, and Python, unpacking.
+
+    // In all four examples, the patterns used are guaranteed to match. Patterns that always match are special in Rust. They're called irrefutable patterns, and they're the only patterns allowed in the four places shown above (after let, in function arguments, after for, and in closure arguments).
+
+    // A refutable pattern is one that might not match, like Ok(x), which doesn't match an error result, or '0' ... '9', which doesn't match the character 'Q'. Refutable patterns can be used in match arms, because match is designed for them. If on patterns fails to match, it's clear what happens next. The four examples above are places in Rust program where a pattern can be handy, but the languges doesn't allow for match failure.
+
+    // Refutable patterns are also allowed in if let and while let expressions, which can be used to...
+
+    // ...handle just one enum variant specially
+    if let RoughTime::InTheFuture(_, _) = user.date_of_birth() {
+        user.set_time_traveler(true);
+    }
+
+    // ...run some code only if a table lookup succeeds
+    if let Some(document) = cache_map.get(&id) {
+        return send_cached_response(document);
+    }
+
+    // ...repeatedly try something until it succeeds
+    while let Err(err) = present_cheesy_anti_robot_task() {
+        log_robot_attempt(err);
+        // let the user try again (it might still be a human)
+    }
+
+    // ...manually loop over an iterator
+    while let Some(_) = lines.peek() {
+        read_paragraph(&mut lines);
+    }
     
 
 
