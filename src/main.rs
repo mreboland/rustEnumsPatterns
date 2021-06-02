@@ -278,5 +278,29 @@ fn main() {
 
 
 
+    // @ patterns
+
+    // Finally, x @ pattern matches exactly like the given pattern, but on success, instead of creating variables for parts of the matched value, it creates a single variable x and moves or copies the whole value into it. For example:
+    match self.get_selection() {
+        Shape::Rect(top_left, bottom_right) =>
+            optimized_paint(&Shape::Rect(top_left, bottom_right)),
+        other_shape =>
+            paint_outline(other_shape.get_outline()),
+    }
+
+    // The first case unpacks a Shape::Rect value, only to rebuild an identical Shape::Rect value on the next line. This can be rewritten to use an @ pattern:
+        rect @ Shape::Rect(..) =>
+            optimized_paint(&rect),
+
+    // @ patterns are also useful with ranges:
+    match chars.next() {
+        Some(digit @ '0' ... '9') => read_number(digit, chars)
+        ...
+    }
+
+    
+
+
+
 
 }
