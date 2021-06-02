@@ -230,4 +230,37 @@ fn main() {
     }
 
 
+
+    // Matching Multiple Possibilities
+
+    // The vertical bar(|) can be used to combine several patterns in a single match arm:
+    let at_end =
+        match chars.peek() {
+            Some(&'\r') | Some(&'\n') | None => true,
+            _ => false
+        };
+
+    // In an expression, | is the bitwise OR operator, but here it works more like the | symbol in a regular expression. at_end is set to true if chars.peek() matches any of the three patterns.
+
+    // Use ... to match a whole range of values. Range patterns include the begin and end values, so '0' ... '9' matches all the ASCII digits:
+    match next_char {
+        '0' ... '9' =>
+            self.read_number(),
+        'a' ... 'z' | 'A' ... 'Z' =>
+            self.read_word(),
+        ' ' | '\t' | '\n' =>
+            self.skip_whitespace(),
+        _ =>
+            self.handle_punctuation()
+    }
+
+    // Ranges in patterns are inclusive, so that both '0' and '9' match the pattern '0' ... '9'. By contrast, range expressions (written with two dots, as in for n in 0..100) are half-open, or exclusive (covering 0 but not 100). The reason for the inconsistency is simply that exclusive ranges are more useful for loops and slicing, but inclusive ranges are more useful in pattern matching.
+
+
+
+    
+
+
+
+
 }
