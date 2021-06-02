@@ -350,7 +350,56 @@ fn main() {
     while let Some(_) = lines.peek() {
         read_paragraph(&mut lines);
     }
-    
+
+
+
+    // Populating a Binary Tree
+
+    // Earlier it was mentioned a how to implement a method. BinaryTree::add(), that adds a node to a BinaryTree of this type:
+    enum BinaryTree<T> {
+        Empty,
+        NonEmpty(Box<TreeNode<T>>)
+    }
+
+    struct TreeNode<T> {
+        element: T,
+        left: BinaryTree<T>,
+        right: BinaryTree<T>
+    }
+
+    impl<T: Ord>BinaryTree<T> {
+        fn add(&mut self, value: T) {
+            match *self {
+                BinaryTree::Empty =>
+                    *self = BinaryTree::NonEmpty(Box::new(TreeNode {
+                        element: value,
+                        left: BinaryTree::Empty,
+                        right: BinaryTree::Empty
+                    })),
+                BinaryTree::NonEmpty(ref mut node) =>
+                    if value <= node.element {
+                        node.left.add(value);
+                    } else {
+                        node.right.add(value);
+                    }
+            }
+        }
+    }
+
+    // Line 370 tells Rust that we're defining a method on BinaryTrees of ordered types. This is exactly the same syntax we use to define methods on generic structs, explained in "Defining Methods with impl" in chapt 9.
+
+    // If the existing tree *self is empty, that's the easy case. Lines 374-378 run, changing the Empty tree to a NonEmpty one. The call to Box::new() here allocates a new TreeNode in the heap. When we're done, the tree contains one element. Its left and right subtrees are both Empty.
+
+    // If *self is not empty, we match the pattern on line 379:
+    BinaryTree::NonEmpty(ref mut node) =>
+
+    // This pattern borrows a mutable ref to the Box<TreeNode<T>>, so we can access and modify data in that tree node. That ref is named node, and it's in scope from line 380 to 384. Since there's already an element in this node, the code must recursively call .add() to add the new element to either the left or the right subtree.
+
+    // The new method can be used like this:
+    let mut tree = BinaryTree::Empty;
+    tree.add("Mercury");
+    tree.add("Venus");
+    ...
 
 
 
