@@ -258,7 +258,23 @@ fn main() {
 
 
 
-    
+    // Pattern Guards
+
+    // Use the if keyword to add a guard to a match arm. The match succeeds only if the guard evaluates to true:
+    match robot.last_known_location() {
+        Some(point) if self.distance_to(point) < 10 =>
+            short_distance_strategy(point),
+        Some(point) =>
+            long_distance_strategy(point),
+        None =>
+            searching_strategy()
+    }
+
+    // If a pattern moves any values, we can't put a guard on it. The guard might evaluate to false, and then Rust would go on to the next pattern. But it can't do that if we've moved bits out of the value to be matched. Therefore, the preceding code works only if point is copyable. If it's not, we'll get an error:
+    // error: cannot bind by-move into a pattern guard
+    // enums_move_into_guard.rs...
+
+    // The workaround would be to change the pattern to borrow point instead of moving it, Some(ref point).
 
 
 
